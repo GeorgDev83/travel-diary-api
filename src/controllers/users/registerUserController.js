@@ -1,3 +1,4 @@
+import insertUserService from "../../services/users/insertUserService.js";
 import generateErrorsUtils from "../../utils/generateErrorsUtils.js";
 
 const registerUserController = async(req, res, next) => {
@@ -5,9 +6,11 @@ const registerUserController = async(req, res, next) => {
         const {email, password} = req.body;
 
         if(!email || !password) throw generateErrorsUtils("Se esperaba email o contraseña!");
-        res.send({data: {email, password}});
+
+        await insertUserService(email, password);
+
+        res.send({status: 'ok', message: 'Usuario registrado correctamente'});
     } catch(error) {
-        console.log(error);
         next(error);
     }
 }
