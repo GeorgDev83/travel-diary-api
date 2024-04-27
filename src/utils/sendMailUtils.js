@@ -14,7 +14,7 @@ const transport = nodemailer.createTransport({
 
 const sendMailUtils = async (email, subject, body) => {
         const mailOptions = {from: SMTP_USER, to: email, subject: subject, html: body};
-        transport.sendMail(mailOptions, function(error, info){
+        transport.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log(error);
                 throw generateErrorsUtils('Error al enviar el email!', 500);

@@ -3,7 +3,7 @@ import generateErrorsUtils from '../../utils/generateErrorsUtils.js';
 import bcrypt from 'bcrypt';
 import sendMailUtils from '../../utils/sendMailUtils.js';
 
-const insertUserService = async (email, password) => {
+const insertUserService = async (email, password, registrationCode) => {
     const pool = await getPool();
 
     const [user] = await pool.query(`
@@ -12,10 +12,6 @@ const insertUserService = async (email, password) => {
     
     if(user.length) throw generateErrorsUtils('El email ya se encuentra registrado', 509);
 
-    /**
-     * logica d eenvío del email
-     */
-    const registrationCode = "XUBBHNJJJKLLJLK";
     const emailSubject='Activa tu diario de viajes';
     const emailBody=`
         Bienvenid@
@@ -37,9 +33,9 @@ const insertUserService = async (email, password) => {
     const passwordHashed = await bcrypt.hash(password, 10);
 
     await pool.query(`
-        INSERT INTO users (email, password)
-        VALUES (?, ?)
-    `, [email, passwordHashed]);
+        INSERT INTO users (email, password, registrationCode)
+        VALUES (?, ?, ?)
+    `, [email, passwordHashed, registrationCode]);
 }
 
 export default insertUserService;

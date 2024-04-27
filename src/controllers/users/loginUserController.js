@@ -1,6 +1,7 @@
 import generateErrorsUtils from "../../utils/generateErrorsUtils.js";
 import selectUserByEMailService from "../../services/users/selectUserByEmailService.js";
 import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
 
 const loginUserController = async (req, res, next) => {
     try {
@@ -24,9 +25,15 @@ const loginUserController = async (req, res, next) => {
         }
 
         /**
-         * El token si no fuera hardcodeado identifica unequivocamente al usuario
+         * El token identifica unequivocamente al usuario
          */
-        const token = 'abcde.fghijk.lmnñopq';
+        const tokeInfo = {
+            id: user.id,
+            role: user.role
+        };
+        const token = jwt.sign(tokeInfo, process.env.SECRET, {
+            expiresIn: '3d'
+        });
 
         res.send({status: 'ok', token: token});
 

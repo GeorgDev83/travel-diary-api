@@ -6,7 +6,7 @@ const userExists = async (req, res, next) => {
     try {
         const pool = await getPool();
 
-        const {userId} = req.params;
+        const userId = req.params.userId || req.user?.id;
 
         const [user] = await pool.query(`
             SELECT id FROM users WHERE id=?

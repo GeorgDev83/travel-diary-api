@@ -1,5 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
+import fileUpload from 'express-fileupload';
 
 import routes from './routes/index.js';
 
@@ -15,6 +16,7 @@ const server = express();
  */
 server.use(morgan('dev'));
 server.use(express.json());
+server.use(fileUpload());
 
 /**
  * Llamado a rutas
