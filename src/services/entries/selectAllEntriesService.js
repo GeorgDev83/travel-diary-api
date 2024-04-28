@@ -25,33 +25,30 @@ const selectAllEntriesService = async () => {
 	}*/
 
 	const [entries] = await pool.query(`
-		SELECT e.id, e.title, e.place, e.userId, u.email, eph.name, ev.votes
+		SELECT e.id, e.title, e.place, e.userId, u.email, eph.name, IFNULL(ev.votes,0) as votes
 		FROM entries e
 		INNER JOIN users u ON u.id = e.userId
 		LEFT JOIN (SELECT entryId, AVG(IFNULL(value, 0)) as votes FROM entryvotes GROUP BY entryId) ev ON ev.entryId = e.id
-		LEFT JOIN (SELECT id, name, entryId FROM entryphotos) eph ON eph.entryId = e.id;
+		LEFT JOIN (SELECT id, name, entryId FROM entryphotos) eph ON eph.entryId = e.id
 	`);
 
-	let entriesProc = new Array();
-
-	entries.forEach((element) => {
-		let filterEntries = entries.filter((el) => {
-			return el.id === element.id;
-		});
-		let photos = new Array();
-		filterEntries.forEach((el) => {
-			photos.push(el.name);
-		});
-		let entry = { ...element };
-		delete entry.name;
-		entry.photos = photos;
-		entriesProc.push(entry);
-	});
-
+	let entriesProc = [];
 	let hash = {};
-	entriesProc = entriesProc.filter((o) =>
-		hash[o.id] ? false : (hash[o.id] = true)
-	);
+	entriesProc = entries
+		.map((entry, index, array) => {
+			entry.photos = entries
+				.filter((element, index, array) => {
+					return element.id === entry.id;
+				})
+				.map((element, index, array) => {
+					return element.name;
+				});
+			delete entry.name;
+			return entry;
+		})
+		.filter((element) =>
+			hash[element.id] ? false : (hash[element.id] = true)
+		);
 
 	return entriesProc;
 };
