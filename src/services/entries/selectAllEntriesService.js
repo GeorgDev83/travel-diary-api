@@ -3,7 +3,9 @@ import getPool from '../../database/getPool.js';
 const selectAllEntriesService = async () => {
 	const pool = await getPool();
 
-	/*const [entries] = await pool.query(`
+	/* SQL sin subconsultas
+	
+	const [entries] = await pool.query(`
 		SELECT e.id, e.title, e.place, e.userId, u.email, AVG(IFNULL(v.value, 0)) as votes, e.createdAt
 		FROM entries e
 		LEFT JOIN entryvotes v ON v.entryId = e.id
@@ -30,22 +32,26 @@ const selectAllEntriesService = async () => {
 		LEFT JOIN (SELECT id, name, entryId FROM entryphotos) eph ON eph.entryId = e.id;
 	`);
 
-	const entriesProc = entries.reduce((acumulator, item, index, array) => {
-		let { id, title, place, userId, email, name, votes } = item;
-		let photos = new Array();
-		photos.push(name);
+	let entriesProc = new Array();
 
-		return {
-			id,
-			title,
-			place,
-			userId,
-			email,
-			photos,
-			votes,
-			photos,
-		};
-	}, 0);
+	entries.forEach((element) => {
+		let filterEntries = entries.filter((el) => {
+			return el.id === element.id;
+		});
+		let photos = new Array();
+		filterEntries.forEach((el) => {
+			photos.push(el.name);
+		});
+		let entry = { ...element };
+		delete entry.name;
+		entry.photos = photos;
+		entriesProc.push(entry);
+	});
+
+	let hash = {};
+	entriesProc = entriesProc.filter((o) =>
+		hash[o.id] ? false : (hash[o.id] = true)
+	);
 
 	return entriesProc;
 };
