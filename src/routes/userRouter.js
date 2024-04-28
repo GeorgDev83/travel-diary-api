@@ -10,8 +10,7 @@ import {
 	editUserPasswordController,
 	getOwnUserController,
 } from '../controllers/users/index.js';
-import userExists from '../middleware/userExists.js';
-import authUser from '../middleware/authUser.js';
+import { authUser, userExists } from '../middleware/index.js';
 
 const router = express.Router();
 

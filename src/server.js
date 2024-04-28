@@ -20,6 +20,11 @@ server.use(cors());
 server.use(fileUpload());
 
 /**
+ * Definir una ruta estática
+ */
+server.use('/uploads', express.static(process.env.UPLOAD_DIR));
+
+/**
  * Llamado a rutas
  */
 server.use(routes);
